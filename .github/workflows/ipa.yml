@@ -62,7 +62,7 @@ jobs:
 
       - name: Setup ipatool-py
         run: |
-          git clone -b itunes_server https://github.com/fengyunyongjie/ipatool-py
+          git clone -b master https://github.com/fengyunyongjie/ipatool-py
           pip3 install -r ipatool-py/requirements.txt
           mkdir -p ipaDown
         shell: bash

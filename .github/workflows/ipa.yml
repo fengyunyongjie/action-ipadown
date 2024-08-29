@@ -17,7 +17,8 @@ on:
         description: 'Apple ID Password'
         required: true
       operation:
-        description: 'Operation to do, choices: lookup, historyver, download, historyver_id, download_id'
+        description: 'Operation to do, choices: lookup, historyver, download, purchase, historyver_id, download_id'
+        default: 'purchase'
       
       appBundleId:
         description: 'AppStore Bundle-ID (needed when using non-*_id operations)'
@@ -25,7 +26,7 @@ on:
       appCountry:
         description: 'AppStore Country (needed when using non-*_id operations)'
         required: false
-        default: 'JP'
+        default: 'US'
       
       appVerId:
         description: 'App Version Id Number (for downloading history versions)'
@@ -38,11 +39,11 @@ on:
       debug_enabled:
         description: 'Run the build with RDP debugging enabled'
         required: false
-        default: false
+        default: ''
       itunes_debug_enabled:
         description: 'Run the build with ngrok debugging enabled'
         required: false
-        default: false
+        default: ''
 
 jobs:
   download_ipa:
@@ -94,9 +95,14 @@ jobs:
               python3 ipatool-py/main.py --json historyver -s http://127.0.0.1:9000 --appId ${{ github.event.inputs.id }}
             fi
           elif [[ "$op" == "purchase" ]]; then
-            output=$(python3 ipatool-py/main.py --json lookup -b ${{ github.event.inputs.appBundleId }} -c ${{ github.event.inputs.appCountry }} \
+            IFS=','
+            read -ra array <<< "${{ github.event.inputs.appBundleId }}
+            for element in "${array[@]}"; do
+              output=$(python3 ipatool-py/main.py --json lookup -b $element -c ${{ github.event.inputs.appCountry }} \
                                                 purchase -s http://127.0.0.1:9000)
-            echo "Got purchase JSON result: $output"
+              echo "Got purchase JSON result: $output"
+            done
+            
           elif [[ "$op" == download* ]]; then
             if [[ "${{ github.event.inputs.appVerId }}" == "" ]]; then
               appVerCmd=""

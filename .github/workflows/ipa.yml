@@ -62,7 +62,7 @@ jobs:
 
       - name: Setup ipatool-py
         run: |
-          git clone -b itunes_server https://github.com/NyaMisty/ipatool-py
+          git clone -b itunes_server https://github.com/fengyunyongjie/ipatool-py
           pip3 install -r ipatool-py/requirements.txt
           mkdir -p ipaDown
         shell: bash
@@ -78,7 +78,7 @@ jobs:
       - name: Execute operation
         id: operation
         run: |
-          # available operations: lookup, historyver, download, historyver_id, download_id
+          # available operations: lookup, historyver, download, purchase, historyver_id, download_id
           op=${{ github.event.inputs.operation }}
           if [[ "$op" == "lookup" ]]; then
             if [[ "${{ github.event.inputs.appBundleId }}" != "" ]]; then
@@ -93,6 +93,10 @@ jobs:
             elif [[ "$op" == "historyver_id" ]]; then
               python3 ipatool-py/main.py --json historyver -s http://127.0.0.1:9000 --appId ${{ github.event.inputs.id }}
             fi
+          elif [[ "$op" == "purchase" ]]; then
+            output=$(python3 ipatool-py/main.py --json lookup -b ${{ github.event.inputs.appBundleId }} -c ${{ github.event.inputs.appCountry }} \
+                                                purchase -s http://127.0.0.1:9000)
+            echo "Got purchase JSON result: $output"
           elif [[ "$op" == download* ]]; then
             if [[ "${{ github.event.inputs.appVerId }}" == "" ]]; then
               appVerCmd=""

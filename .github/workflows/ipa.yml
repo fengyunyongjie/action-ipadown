@@ -96,9 +96,9 @@ jobs:
             fi
           elif [[ "$op" == "purchase" ]]; then
             IFS=','
-            read -ra array <<< "${{ github.event.inputs.appBundleId }}
+            read -ra array <<< "${{ github.event.inputs.appBundleId }}"
             for element in "${array[@]}"; do
-              output=$(python3 ipatool-py/main.py --json lookup -b $element -c ${{ github.event.inputs.appCountry }} \
+              output=$(python3 ipatool-py/main.py --json lookup -b "$element" -c "${{ github.event.inputs.appCountry }}" \
                                                 purchase -s http://127.0.0.1:9000)
               echo "Got purchase JSON result: $output"
             done
